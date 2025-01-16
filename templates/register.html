@@ -1,0 +1,77 @@
+{% extends 'index.html' %}
+
+
+{% block navbar %}
+    <ul class="navbar-nav ml-auto">
+        <li class="nav-item active">
+            <a class="nav-link" href="{{url_for('index')}}" style="color: white;">Home</a>
+        </li>
+        <li class="nav-item active">
+            <a class="nav-link" href="{{url_for('about')}}" style="color: white; padding-left: 40px;">About</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="{{url_for('register')}}" style="color: yellow; padding-left: 40px;">Register</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="{{url_for('login')}}" style="color: white; padding-left: 40px;">LogIn</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="{{url_for('chatbot')}}" style="color: white; padding-left: 40px;">Chatbot</a>
+        </li>
+    </ul>
+{% endblock %}
+
+
+{% block content %}
+    <div style="margin-top: 50px; min-height: 650px; height: auto; background-color: rgba(0, 0, 0, 0.797);">
+        <div class="container-fluid" style="margin-top: -50px;">
+            <div class="contact_section_2">
+                <div class="row">
+                    <center>
+                        <div class="col-md-6">
+
+                            <form action="{{url_for('register')}}" method="post" enctype="multipart/form-data" onsubmit="return validateForm()" style="background-color: rgba(255, 255, 255, 0.575); width: fit-content; padding: 20px; border-radius: 10px; margin-top: -30px;">
+                                <h1 class="contact_taital" style="color: rgba(0, 0, 0, 0.849);">Registration</h1>
+
+                                <input type="text" name="name" class="mail_text" placeholder="User Name" required
+                                minlength="3" maxlength="30" pattern="[A-Za-z\s]+" title="User Name should be 3-30 characters long and only contain letters and spaces">
+                            
+                                <input type="email" name="email" class="mail_text" placeholder="Email ID" required>
+                                
+                                <input type="password" name="password" class="mail_text" placeholder="Password" required
+                                    minlength="8" title="Password must be at least 8 characters long">
+
+                                <input type="password" name="c_password" class="mail_text" placeholder="Confirm Password" required
+                                    minlength="8" title="Password must be at least 8 characters long">
+
+
+                                <button type="submit" class="btn btn-info" style="margin-top: 20px; width: 30%;">Submit</button><br><br>
+
+                                <a href="{{url_for('login')}}">
+                                    Do you already have an account? 
+                                    <u style="color: blue;"><i>Login here</i></u>
+                                </a>
+                            </form>
+                        </div>
+                    </center>
+                        
+                    <script>
+                    function validateForm() {
+                        var name = document.getElementsByName('name')[0].value;
+                    
+                        if (name.length < 3) {
+                            alert("User Name must be at least 3 characters long.");
+                            return false;
+                        }
+                    
+                        // You can add other custom validations here as needed
+                    
+                        return true;
+                    }
+                    </script>
+                                            
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

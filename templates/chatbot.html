@@ -1,0 +1,1757 @@
+{% extends 'index.html' %}
+
+
+{% block navbar %}
+    <ul class="navbar-nav ml-auto">
+        <li class="nav-item active">
+            <a class="nav-link" href="{{url_for('index')}}" style="color: white;">Home</a>
+        </li>
+        <li class="nav-item active">
+            <a class="nav-link" href="{{url_for('about')}}" style="color: white; padding-left: 40px;">About</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="{{url_for('register')}}" style="color: white; padding-left: 40px;">Register</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="{{url_for('login')}}" style="color: white; padding-left: 40px;">LogIn</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="{{url_for('chatbot')}}" style="color: yellow; padding-left: 40px;">Chatbot</a>
+        </li>
+    </ul>
+{% endblock %}
+
+
+{% block content %}
+
+<style>
+    /* styles.css */
+
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #f2f2f2;
+    }
+
+    .chat-container {
+        width: 400px;
+        max-width: 90%;
+        margin: 50px auto;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        background-color: #fff;
+        display: flex;
+        flex-direction: column;
+        height: 600px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    #chat-window {
+        flex: 1;
+        padding: 20px;
+        overflow-y: auto;
+        border-bottom: 1px solid #ccc;
+    }
+
+    .message {
+        margin: 10px 0;
+    }
+
+    .bot-message {
+        text-align: left;
+        color: #333;
+    }
+
+    .user-message {
+        text-align: right;
+        color: #007BFF;
+    }
+
+    #input-area {
+        display: flex;
+        padding: 10px;
+    }
+
+    #user-input {
+        flex: 1;
+        padding: 10px;
+        font-size: 16px;
+        border: 1px solid #ccc;
+        border-radius: 3px;
+    }
+
+    #send-button {
+        padding: 10px 20px;
+        font-size: 16px;
+        margin-left: 10px;
+        cursor: pointer;
+        background-color: #007BFF;
+        color: #fff;
+        border: none;
+        border-radius: 3px;
+    }
+
+    #send-button:hover {
+        background-color: #0056b3;
+    }
+
+    .option-button {
+        padding: 10px 15px;
+        margin: 5px;
+        background-color: #e7e7e7;
+        border: none;
+        border-radius: 3px;
+        cursor: pointer;
+    }
+
+    .option-button:hover {
+        background-color: #d4d4d4;
+    }
+
+    .video {
+        margin: 10px 0;
+    }
+
+    .video a {
+        color: #007BFF;
+        text-decoration: none;
+    }
+
+    .video a:hover {
+        text-decoration: underline;
+    }
+
+</style>
+
+<div style="min-height: 780px; background-color: rgba(0, 0, 0, 0.797);">
+    <div class="container-fluid">
+        <div class="contact_section_2">
+            <div class="row">
+                <div class="col-md-12">
+                    <center>
+                                            
+                        <div class="chat-container">
+                            <div id="chat-window">
+                                <div id="messages"></div>
+                            </div>
+                            <div id="input-area">
+                                <input type="text" id="user-input" placeholder="Type your message here..." disabled>
+                                <button id="send-button" disabled>Send</button>
+                            </div>
+                        </div>
+                    </center>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    // chatbot.js
+
+// Emotions Data (Ensure all emotions are included as needed)
+const emotionsData = {
+    "emotions": [
+        {
+            "name": "happy",
+            "follow_up_question": "What made you feel happy?",
+            "reasons": [
+                "Health",
+                "Work",
+                "Relationships",
+                "Other"
+            ],
+            "comfort": "It's okay to feel happy. Every emotion has a reason. Let\u2019s explore it together!",
+            "videos": [
+                {
+                    "title": "Understanding Happy",
+                    "link": "https://youtube.com/example_happy1"
+                },
+                {
+                    "title": "Coping with Happy",
+                    "link": "https://youtube.com/example_happy2"
+                }
+            ],
+            "feedback_question": "How do you feel after exploring your happy?",
+            "feedback_positive": "That's great! Embracing your happy is a step forward. \ud83c\udf1f",
+            "feedback_negative": "I'm here for you. Let\u2019s find a way to navigate through this happy together."
+        },
+        {
+            "name": "excited",
+            "follow_up_question": "What made you feel excited?",
+            "reasons": [
+                "Health",
+                "Work",
+                "Relationships",
+                "Other"
+            ],
+            "comfort": "It's okay to feel excited. Every emotion has a reason. Let\u2019s explore it together!",
+            "videos": [
+                {
+                    "title": "Understanding Excited",
+                    "link": "https://youtube.com/example_excited1"
+                },
+                {
+                    "title": "Coping with Excited",
+                    "link": "https://youtube.com/example_excited2"
+                }
+            ],
+            "feedback_question": "How do you feel after exploring your excited?",
+            "feedback_positive": "That's great! Embracing your excited is a step forward. \ud83c\udf1f",
+            "feedback_negative": "I'm here for you. Let\u2019s find a way to navigate through this excited together."
+        },
+        {
+            "name": "grateful",
+            "follow_up_question": "What made you feel grateful?",
+            "reasons": [
+                "Health",
+                "Work",
+                "Relationships",
+                "Other"
+            ],
+            "comfort": "It's okay to feel grateful. Every emotion has a reason. Let\u2019s explore it together!",
+            "videos": [
+                {
+                    "title": "Understanding Grateful",
+                    "link": "https://youtube.com/example_grateful1"
+                },
+                {
+                    "title": "Coping with Grateful",
+                    "link": "https://youtube.com/example_grateful2"
+                }
+            ],
+            "feedback_question": "How do you feel after exploring your grateful?",
+            "feedback_positive": "That's great! Embracing your grateful is a step forward. \ud83c\udf1f",
+            "feedback_negative": "I'm here for you. Let\u2019s find a way to navigate through this grateful together."
+        },
+        {
+            "name": "confident",
+            "follow_up_question": "What made you feel confident?",
+            "reasons": [
+                "Health",
+                "Work",
+                "Relationships",
+                "Other"
+            ],
+            "comfort": "It's okay to feel confident. Every emotion has a reason. Let\u2019s explore it together!",
+            "videos": [
+                {
+                    "title": "Understanding Confident",
+                    "link": "https://youtube.com/example_confident1"
+                },
+                {
+                    "title": "Coping with Confident",
+                    "link": "https://youtube.com/example_confident2"
+                }
+            ],
+            "feedback_question": "How do you feel after exploring your confident?",
+            "feedback_positive": "That's great! Embracing your confident is a step forward. \ud83c\udf1f",
+            "feedback_negative": "I'm here for you. Let\u2019s find a way to navigate through this confident together."
+        },
+        {
+            "name": "proud",
+            "follow_up_question": "What made you feel proud?",
+            "reasons": [
+                "Health",
+                "Work",
+                "Relationships",
+                "Other"
+            ],
+            "comfort": "It's okay to feel proud. Every emotion has a reason. Let\u2019s explore it together!",
+            "videos": [
+                {
+                    "title": "Understanding Proud",
+                    "link": "https://youtube.com/example_proud1"
+                },
+                {
+                    "title": "Coping with Proud",
+                    "link": "https://youtube.com/example_proud2"
+                }
+            ],
+            "feedback_question": "How do you feel after exploring your proud?",
+            "feedback_positive": "That's great! Embracing your proud is a step forward. \ud83c\udf1f",
+            "feedback_negative": "I'm here for you. Let\u2019s find a way to navigate through this proud together."
+        },
+        {
+            "name": "relieved",
+            "follow_up_question": "What made you feel relieved?",
+            "reasons": [
+                "Health",
+                "Work",
+                "Relationships",
+                "Other"
+            ],
+            "comfort": "It's okay to feel relieved. Every emotion has a reason. Let\u2019s explore it together!",
+            "videos": [
+                {
+                    "title": "Understanding Relieved",
+                    "link": "https://youtube.com/example_relieved1"
+                },
+                {
+                    "title": "Coping with Relieved",
+                    "link": "https://youtube.com/example_relieved2"
+                }
+            ],
+            "feedback_question": "How do you feel after exploring your relieved?",
+            "feedback_positive": "That's great! Embracing your relieved is a step forward. \ud83c\udf1f",
+            "feedback_negative": "I'm here for you. Let\u2019s find a way to navigate through this relieved together."
+        },
+        {
+            "name": "cheerful",
+            "follow_up_question": "What made you feel cheerful?",
+            "reasons": [
+                "Health",
+                "Work",
+                "Relationships",
+                "Other"
+            ],
+            "comfort": "It's okay to feel cheerful. Every emotion has a reason. Let\u2019s explore it together!",
+            "videos": [
+                {
+                    "title": "Understanding Cheerful",
+                    "link": "https://youtube.com/example_cheerful1"
+                },
+                {
+                    "title": "Coping with Cheerful",
+                    "link": "https://youtube.com/example_cheerful2"
+                }
+            ],
+            "feedback_question": "How do you feel after exploring your cheerful?",
+            "feedback_positive": "That's great! Embracing your cheerful is a step forward. \ud83c\udf1f",
+            "feedback_negative": "I'm here for you. Let\u2019s find a way to navigate through this cheerful together."
+        },
+        {
+            "name": "hopeful",
+            "follow_up_question": "What made you feel hopeful?",
+            "reasons": [
+                "Health",
+                "Work",
+                "Relationships",
+                "Other"
+            ],
+            "comfort": "It's okay to feel hopeful. Every emotion has a reason. Let\u2019s explore it together!",
+            "videos": [
+                {
+                    "title": "Understanding Hopeful",
+                    "link": "https://youtube.com/example_hopeful1"
+                },
+                {
+                    "title": "Coping with Hopeful",
+                    "link": "https://youtube.com/example_hopeful2"
+                }
+            ],
+            "feedback_question": "How do you feel after exploring your hopeful?",
+            "feedback_positive": "That's great! Embracing your hopeful is a step forward. \ud83c\udf1f",
+            "feedback_negative": "I'm here for you. Let\u2019s find a way to navigate through this hopeful together."
+        },
+        {
+            "name": "loved",
+            "follow_up_question": "What made you feel loved?",
+            "reasons": [
+                "Health",
+                "Work",
+                "Relationships",
+                "Other"
+            ],
+            "comfort": "It's okay to feel loved. Every emotion has a reason. Let\u2019s explore it together!",
+            "videos": [
+                {
+                    "title": "Understanding Loved",
+                    "link": "https://youtube.com/example_loved1"
+                },
+                {
+                    "title": "Coping with Loved",
+                    "link": "https://youtube.com/example_loved2"
+                }
+            ],
+            "feedback_question": "How do you feel after exploring your loved?",
+            "feedback_positive": "That's great! Embracing your loved is a step forward. \ud83c\udf1f",
+            "feedback_negative": "I'm here for you. Let\u2019s find a way to navigate through this loved together."
+        },
+        {
+            "name": "content",
+            "follow_up_question": "What made you feel content?",
+            "reasons": [
+                "Health",
+                "Work",
+                "Relationships",
+                "Other"
+            ],
+            "comfort": "It's okay to feel content. Every emotion has a reason. Let\u2019s explore it together!",
+            "videos": [
+                {
+                    "title": "Understanding Content",
+                    "link": "https://youtube.com/example_content1"
+                },
+                {
+                    "title": "Coping with Content",
+                    "link": "https://youtube.com/example_content2"
+                }
+            ],
+            "feedback_question": "How do you feel after exploring your content?",
+            "feedback_positive": "That's great! Embracing your content is a step forward. \ud83c\udf1f",
+            "feedback_negative": "I'm here for you. Let\u2019s find a way to navigate through this content together."
+        },
+        {
+            "name": "sad",
+            "follow_up_question": "What made you feel sad?",
+            "reasons": [
+                "Health",
+                "Work",
+                "Relationships",
+                "Other"
+            ],
+            "comfort": "It's okay to feel sad. Every emotion has a reason. Let\u2019s explore it together!",
+            "videos": [
+                {
+                    "title": "Understanding Sad",
+                    "link": "https://youtube.com/example_sad1"
+                },
+                {
+                    "title": "Coping with Sad",
+                    "link": "https://youtube.com/example_sad2"
+                }
+            ],
+            "feedback_question": "How do you feel after exploring your sad?",
+            "feedback_positive": "That's great! Embracing your sad is a step forward. \ud83c\udf1f",
+            "feedback_negative": "I'm here for you. Let\u2019s find a way to navigate through this sad together."
+        },
+        {
+            "name": "lonely",
+            "follow_up_question": "What made you feel lonely?",
+            "reasons": [
+                "Health",
+                "Work",
+                "Relationships",
+                "Other"
+            ],
+            "comfort": "It's okay to feel lonely. Every emotion has a reason. Let\u2019s explore it together!",
+            "videos": [
+                {
+                    "title": "Understanding Lonely",
+                    "link": "https://youtube.com/example_lonely1"
+                },
+                {
+                    "title": "Coping with Lonely",
+                    "link": "https://youtube.com/example_lonely2"
+                }
+            ],
+            "feedback_question": "How do you feel after exploring your lonely?",
+            "feedback_positive": "That's great! Embracing your lonely is a step forward. \ud83c\udf1f",
+            "feedback_negative": "I'm here for you. Let\u2019s find a way to navigate through this lonely together."
+        },
+        {
+            "name": "heartbroken",
+            "follow_up_question": "What made you feel heartbroken?",
+            "reasons": [
+                "Health",
+                "Work",
+                "Relationships",
+                "Other"
+            ],
+            "comfort": "It's okay to feel heartbroken. Every emotion has a reason. Let\u2019s explore it together!",
+            "videos": [
+                {
+                    "title": "Understanding Heartbroken",
+                    "link": "https://youtube.com/example_heartbroken1"
+                },
+                {
+                    "title": "Coping with Heartbroken",
+                    "link": "https://youtube.com/example_heartbroken2"
+                }
+            ],
+            "feedback_question": "How do you feel after exploring your heartbroken?",
+            "feedback_positive": "That's great! Embracing your heartbroken is a step forward. \ud83c\udf1f",
+            "feedback_negative": "I'm here for you. Let\u2019s find a way to navigate through this heartbroken together."
+        },
+        {
+            "name": "depressed",
+            "follow_up_question": "What made you feel depressed?",
+            "reasons": [
+                "Health",
+                "Work",
+                "Relationships",
+                "Other"
+            ],
+            "comfort": "It's okay to feel depressed. Every emotion has a reason. Let\u2019s explore it together!",
+            "videos": [
+                {
+                    "title": "Understanding Depressed",
+                    "link": "https://youtube.com/example_depressed1"
+                },
+                {
+                    "title": "Coping with Depressed",
+                    "link": "https://youtube.com/example_depressed2"
+                }
+            ],
+            "feedback_question": "How do you feel after exploring your depressed?",
+            "feedback_positive": "That's great! Embracing your depressed is a step forward. \ud83c\udf1f",
+            "feedback_negative": "I'm here for you. Let\u2019s find a way to navigate through this depressed together."
+        },
+        {
+            "name": "nostalgic",
+            "follow_up_question": "What made you feel nostalgic?",
+            "reasons": [
+                "Health",
+                "Work",
+                "Relationships",
+                "Other"
+            ],
+            "comfort": "It's okay to feel nostalgic. Every emotion has a reason. Let\u2019s explore it together!",
+            "videos": [
+                {
+                    "title": "Understanding Nostalgic",
+                    "link": "https://youtube.com/example_nostalgic1"
+                },
+                {
+                    "title": "Coping with Nostalgic",
+                    "link": "https://youtube.com/example_nostalgic2"
+                }
+            ],
+            "feedback_question": "How do you feel after exploring your nostalgic?",
+            "feedback_positive": "That's great! Embracing your nostalgic is a step forward. \ud83c\udf1f",
+            "feedback_negative": "I'm here for you. Let\u2019s find a way to navigate through this nostalgic together."
+        },
+        {
+            "name": "disappointed",
+            "follow_up_question": "What made you feel disappointed?",
+            "reasons": [
+                "Health",
+                "Work",
+                "Relationships",
+                "Other"
+            ],
+            "comfort": "It's okay to feel disappointed. Every emotion has a reason. Let\u2019s explore it together!",
+            "videos": [
+                {
+                    "title": "Understanding Disappointed",
+                    "link": "https://youtube.com/example_disappointed1"
+                },
+                {
+                    "title": "Coping with Disappointed",
+                    "link": "https://youtube.com/example_disappointed2"
+                }
+            ],
+            "feedback_question": "How do you feel after exploring your disappointed?",
+            "feedback_positive": "That's great! Embracing your disappointed is a step forward. \ud83c\udf1f",
+            "feedback_negative": "I'm here for you. Let\u2019s find a way to navigate through this disappointed together."
+        },
+        {
+            "name": "regretful",
+            "follow_up_question": "What made you feel regretful?",
+            "reasons": [
+                "Health",
+                "Work",
+                "Relationships",
+                "Other"
+            ],
+            "comfort": "It's okay to feel regretful. Every emotion has a reason. Let\u2019s explore it together!",
+            "videos": [
+                {
+                    "title": "Understanding Regretful",
+                    "link": "https://youtube.com/example_regretful1"
+                },
+                {
+                    "title": "Coping with Regretful",
+                    "link": "https://youtube.com/example_regretful2"
+                }
+            ],
+            "feedback_question": "How do you feel after exploring your regretful?",
+            "feedback_positive": "That's great! Embracing your regretful is a step forward. \ud83c\udf1f",
+            "feedback_negative": "I'm here for you. Let\u2019s find a way to navigate through this regretful together."
+        },
+        {
+            "name": "rejected",
+            "follow_up_question": "What made you feel rejected?",
+            "reasons": [
+                "Health",
+                "Work",
+                "Relationships",
+                "Other"
+            ],
+            "comfort": "It's okay to feel rejected. Every emotion has a reason. Let\u2019s explore it together!",
+            "videos": [
+                {
+                    "title": "Understanding Rejected",
+                    "link": "https://youtube.com/example_rejected1"
+                },
+                {
+                    "title": "Coping with Rejected",
+                    "link": "https://youtube.com/example_rejected2"
+                }
+            ],
+            "feedback_question": "How do you feel after exploring your rejected?",
+            "feedback_positive": "That's great! Embracing your rejected is a step forward. \ud83c\udf1f",
+            "feedback_negative": "I'm here for you. Let\u2019s find a way to navigate through this rejected together."
+        },
+        {
+            "name": "angry",
+            "follow_up_question": "What made you feel angry?",
+            "reasons": [
+                "Health",
+                "Work",
+                "Relationships",
+                "Other"
+            ],
+            "comfort": "It's okay to feel angry. Every emotion has a reason. Let\u2019s explore it together!",
+            "videos": [
+                {
+                    "title": "Understanding Angry",
+                    "link": "https://youtube.com/example_angry1"
+                },
+                {
+                    "title": "Coping with Angry",
+                    "link": "https://youtube.com/example_angry2"
+                }
+            ],
+            "feedback_question": "How do you feel after exploring your angry?",
+            "feedback_positive": "That's great! Embracing your angry is a step forward. \ud83c\udf1f",
+            "feedback_negative": "I'm here for you. Let\u2019s find a way to navigate through this angry together."
+        },
+        {
+            "name": "frustrated",
+            "follow_up_question": "What made you feel frustrated?",
+            "reasons": [
+                "Health",
+                "Work",
+                "Relationships",
+                "Other"
+            ],
+            "comfort": "It's okay to feel frustrated. Every emotion has a reason. Let\u2019s explore it together!",
+            "videos": [
+                {
+                    "title": "Understanding Frustrated",
+                    "link": "https://youtube.com/example_frustrated1"
+                },
+                {
+                    "title": "Coping with Frustrated",
+                    "link": "https://youtube.com/example_frustrated2"
+                }
+            ],
+            "feedback_question": "How do you feel after exploring your frustrated?",
+            "feedback_positive": "That's great! Embracing your frustrated is a step forward. \ud83c\udf1f",
+            "feedback_negative": "I'm here for you. Let\u2019s find a way to navigate through this frustrated together."
+        },
+        {
+            "name": "annoyed",
+            "follow_up_question": "What made you feel annoyed?",
+            "reasons": [
+                "Health",
+                "Work",
+                "Relationships",
+                "Other"
+            ],
+            "comfort": "It's okay to feel annoyed. Every emotion has a reason. Let\u2019s explore it together!",
+            "videos": [
+                {
+                    "title": "Understanding Annoyed",
+                    "link": "https://youtube.com/example_annoyed1"
+                },
+                {
+                    "title": "Coping with Annoyed",
+                    "link": "https://youtube.com/example_annoyed2"
+                }
+            ],
+            "feedback_question": "How do you feel after exploring your annoyed?",
+            "feedback_positive": "That's great! Embracing your annoyed is a step forward. \ud83c\udf1f",
+            "feedback_negative": "I'm here for you. Let\u2019s find a way to navigate through this annoyed together."
+        },
+        {
+            "name": "resentful",
+            "follow_up_question": "What made you feel resentful?",
+            "reasons": [
+                "Health",
+                "Work",
+                "Relationships",
+                "Other"
+            ],
+            "comfort": "It's okay to feel resentful. Every emotion has a reason. Let\u2019s explore it together!",
+            "videos": [
+                {
+                    "title": "Understanding Resentful",
+                    "link": "https://youtube.com/example_resentful1"
+                },
+                {
+                    "title": "Coping with Resentful",
+                    "link": "https://youtube.com/example_resentful2"
+                }
+            ],
+            "feedback_question": "How do you feel after exploring your resentful?",
+            "feedback_positive": "That's great! Embracing your resentful is a step forward. \ud83c\udf1f",
+            "feedback_negative": "I'm here for you. Let\u2019s find a way to navigate through this resentful together."
+        },
+        {
+            "name": "bitter",
+            "follow_up_question": "What made you feel bitter?",
+            "reasons": [
+                "Health",
+                "Work",
+                "Relationships",
+                "Other"
+            ],
+            "comfort": "It's okay to feel bitter. Every emotion has a reason. Let\u2019s explore it together!",
+            "videos": [
+                {
+                    "title": "Understanding Bitter",
+                    "link": "https://youtube.com/example_bitter1"
+                },
+                {
+                    "title": "Coping with Bitter",
+                    "link": "https://youtube.com/example_bitter2"
+                }
+            ],
+            "feedback_question": "How do you feel after exploring your bitter?",
+            "feedback_positive": "That's great! Embracing your bitter is a step forward. \ud83c\udf1f",
+            "feedback_negative": "I'm here for you. Let\u2019s find a way to navigate through this bitter together."
+        },
+        {
+            "name": "jealous",
+            "follow_up_question": "What made you feel jealous?",
+            "reasons": [
+                "Health",
+                "Work",
+                "Relationships",
+                "Other"
+            ],
+            "comfort": "It's okay to feel jealous. Every emotion has a reason. Let\u2019s explore it together!",
+            "videos": [
+                {
+                    "title": "Understanding Jealous",
+                    "link": "https://youtube.com/example_jealous1"
+                },
+                {
+                    "title": "Coping with Jealous",
+                    "link": "https://youtube.com/example_jealous2"
+                }
+            ],
+            "feedback_question": "How do you feel after exploring your jealous?",
+            "feedback_positive": "That's great! Embracing your jealous is a step forward. \ud83c\udf1f",
+            "feedback_negative": "I'm here for you. Let\u2019s find a way to navigate through this jealous together."
+        },
+        {
+            "name": "impatient",
+            "follow_up_question": "What made you feel impatient?",
+            "reasons": [
+                "Health",
+                "Work",
+                "Relationships",
+                "Other"
+            ],
+            "comfort": "It's okay to feel impatient. Every emotion has a reason. Let\u2019s explore it together!",
+            "videos": [
+                {
+                    "title": "Understanding Impatient",
+                    "link": "https://youtube.com/example_impatient1"
+                },
+                {
+                    "title": "Coping with Impatient",
+                    "link": "https://youtube.com/example_impatient2"
+                }
+            ],
+            "feedback_question": "How do you feel after exploring your impatient?",
+            "feedback_positive": "That's great! Embracing your impatient is a step forward. \ud83c\udf1f",
+            "feedback_negative": "I'm here for you. Let\u2019s find a way to navigate through this impatient together."
+        },
+        {
+            "name": "anxious",
+            "follow_up_question": "What made you feel anxious?",
+            "reasons": [
+                "Health",
+                "Work",
+                "Relationships",
+                "Other"
+            ],
+            "comfort": "It's okay to feel anxious. Every emotion has a reason. Let\u2019s explore it together!",
+            "videos": [
+                {
+                    "title": "Understanding Anxious",
+                    "link": "https://youtube.com/example_anxious1"
+                },
+                {
+                    "title": "Coping with Anxious",
+                    "link": "https://youtube.com/example_anxious2"
+                }
+            ],
+            "feedback_question": "How do you feel after exploring your anxious?",
+            "feedback_positive": "That's great! Embracing your anxious is a step forward. \ud83c\udf1f",
+            "feedback_negative": "I'm here for you. Let\u2019s find a way to navigate through this anxious together."
+        },
+        {
+            "name": "nervous",
+            "follow_up_question": "What made you feel nervous?",
+            "reasons": [
+                "Health",
+                "Work",
+                "Relationships",
+                "Other"
+            ],
+            "comfort": "It's okay to feel nervous. Every emotion has a reason. Let\u2019s explore it together!",
+            "videos": [
+                {
+                    "title": "Understanding Nervous",
+                    "link": "https://youtube.com/example_nervous1"
+                },
+                {
+                    "title": "Coping with Nervous",
+                    "link": "https://youtube.com/example_nervous2"
+                }
+            ],
+            "feedback_question": "How do you feel after exploring your nervous?",
+            "feedback_positive": "That's great! Embracing your nervous is a step forward. \ud83c\udf1f",
+            "feedback_negative": "I'm here for you. Let\u2019s find a way to navigate through this nervous together."
+        },
+        {
+            "name": "overwhelmed",
+            "follow_up_question": "What made you feel overwhelmed?",
+            "reasons": [
+                "Health",
+                "Work",
+                "Relationships",
+                "Other"
+            ],
+            "comfort": "It's okay to feel overwhelmed. Every emotion has a reason. Let\u2019s explore it together!",
+            "videos": [
+                {
+                    "title": "Understanding Overwhelmed",
+                    "link": "https://youtube.com/example_overwhelmed1"
+                },
+                {
+                    "title": "Coping with Overwhelmed",
+                    "link": "https://youtube.com/example_overwhelmed2"
+                }
+            ],
+            "feedback_question": "How do you feel after exploring your overwhelmed?",
+            "feedback_positive": "That's great! Embracing your overwhelmed is a step forward. \ud83c\udf1f",
+            "feedback_negative": "I'm here for you. Let\u2019s find a way to navigate through this overwhelmed together."
+        },
+        {
+            "name": "fearful",
+            "follow_up_question": "What made you feel fearful?",
+            "reasons": [
+                "Health",
+                "Work",
+                "Relationships",
+                "Other"
+            ],
+            "comfort": "It's okay to feel fearful. Every emotion has a reason. Let\u2019s explore it together!",
+            "videos": [
+                {
+                    "title": "Understanding Fearful",
+                    "link": "https://youtube.com/example_fearful1"
+                },
+                {
+                    "title": "Coping with Fearful",
+                    "link": "https://youtube.com/example_fearful2"
+                }
+            ],
+            "feedback_question": "How do you feel after exploring your fearful?",
+            "feedback_positive": "That's great! Embracing your fearful is a step forward. \ud83c\udf1f",
+            "feedback_negative": "I'm here for you. Let\u2019s find a way to navigate through this fearful together."
+        },
+        {
+            "name": "worried",
+            "follow_up_question": "What made you feel worried?",
+            "reasons": [
+                "Health",
+                "Work",
+                "Relationships",
+                "Other"
+            ],
+            "comfort": "It's okay to feel worried. Every emotion has a reason. Let\u2019s explore it together!",
+            "videos": [
+                {
+                    "title": "Understanding Worried",
+                    "link": "https://youtube.com/example_worried1"
+                },
+                {
+                    "title": "Coping with Worried",
+                    "link": "https://youtube.com/example_worried2"
+                }
+            ],
+            "feedback_question": "How do you feel after exploring your worried?",
+            "feedback_positive": "That's great! Embracing your worried is a step forward. \ud83c\udf1f",
+            "feedback_negative": "I'm here for you. Let\u2019s find a way to navigate through this worried together."
+        },
+        {
+            "name": "panicked",
+            "follow_up_question": "What made you feel panicked?",
+            "reasons": [
+                "Health",
+                "Work",
+                "Relationships",
+                "Other"
+            ],
+            "comfort": "It's okay to feel panicked. Every emotion has a reason. Let\u2019s explore it together!",
+            "videos": [
+                {
+                    "title": "Understanding Panicked",
+                    "link": "https://youtube.com/example_panicked1"
+                },
+                {
+                    "title": "Coping with Panicked",
+                    "link": "https://youtube.com/example_panicked2"
+                }
+            ],
+            "feedback_question": "How do you feel after exploring your panicked?",
+            "feedback_positive": "That's great! Embracing your panicked is a step forward. \ud83c\udf1f",
+            "feedback_negative": "I'm here for you. Let\u2019s find a way to navigate through this panicked together."
+        },
+        {
+            "name": "insecure",
+            "follow_up_question": "What made you feel insecure?",
+            "reasons": [
+                "Health",
+                "Work",
+                "Relationships",
+                "Other"
+            ],
+            "comfort": "It's okay to feel insecure. Every emotion has a reason. Let\u2019s explore it together!",
+            "videos": [
+                {
+                    "title": "Understanding Insecure",
+                    "link": "https://youtube.com/example_insecure1"
+                },
+                {
+                    "title": "Coping with Insecure",
+                    "link": "https://youtube.com/example_insecure2"
+                }
+            ],
+            "feedback_question": "How do you feel after exploring your insecure?",
+            "feedback_positive": "That's great! Embracing your insecure is a step forward. \ud83c\udf1f",
+            "feedback_negative": "I'm here for you. Let\u2019s find a way to navigate through this insecure together."
+        },
+        {
+            "name": "embarrassed",
+            "follow_up_question": "What made you feel embarrassed?",
+            "reasons": [
+                "Health",
+                "Work",
+                "Relationships",
+                "Other"
+            ],
+            "comfort": "It's okay to feel embarrassed. Every emotion has a reason. Let\u2019s explore it together!",
+            "videos": [
+                {
+                    "title": "Understanding Embarrassed",
+                    "link": "https://youtube.com/example_embarrassed1"
+                },
+                {
+                    "title": "Coping with Embarrassed",
+                    "link": "https://youtube.com/example_embarrassed2"
+                }
+            ],
+            "feedback_question": "How do you feel after exploring your embarrassed?",
+            "feedback_positive": "That's great! Embracing your embarrassed is a step forward. \ud83c\udf1f",
+            "feedback_negative": "I'm here for you. Let\u2019s find a way to navigate through this embarrassed together."
+        },
+        {
+            "name": "ashamed",
+            "follow_up_question": "What made you feel ashamed?",
+            "reasons": [
+                "Health",
+                "Work",
+                "Relationships",
+                "Other"
+            ],
+            "comfort": "It's okay to feel ashamed. Every emotion has a reason. Let\u2019s explore it together!",
+            "videos": [
+                {
+                    "title": "Understanding Ashamed",
+                    "link": "https://youtube.com/example_ashamed1"
+                },
+                {
+                    "title": "Coping with Ashamed",
+                    "link": "https://youtube.com/example_ashamed2"
+                }
+            ],
+            "feedback_question": "How do you feel after exploring your ashamed?",
+            "feedback_positive": "That's great! Embracing your ashamed is a step forward. \ud83c\udf1f",
+            "feedback_negative": "I'm here for you. Let\u2019s find a way to navigate through this ashamed together."
+        },
+        {
+            "name": "guilty",
+            "follow_up_question": "What made you feel guilty?",
+            "reasons": [
+                "Health",
+                "Work",
+                "Relationships",
+                "Other"
+            ],
+            "comfort": "It's okay to feel guilty. Every emotion has a reason. Let\u2019s explore it together!",
+            "videos": [
+                {
+                    "title": "Understanding Guilty",
+                    "link": "https://youtube.com/example_guilty1"
+                },
+                {
+                    "title": "Coping with Guilty",
+                    "link": "https://youtube.com/example_guilty2"
+                }
+            ],
+            "feedback_question": "How do you feel after exploring your guilty?",
+            "feedback_positive": "That's great! Embracing your guilty is a step forward. \ud83c\udf1f",
+            "feedback_negative": "I'm here for you. Let\u2019s find a way to navigate through this guilty together."
+        },
+        {
+            "name": "surprised",
+            "follow_up_question": "What made you feel surprised?",
+            "reasons": [
+                "Health",
+                "Work",
+                "Relationships",
+                "Other"
+            ],
+            "comfort": "It's okay to feel surprised. Every emotion has a reason. Let\u2019s explore it together!",
+            "videos": [
+                {
+                    "title": "Understanding Surprised",
+                    "link": "https://youtube.com/example_surprised1"
+                },
+                {
+                    "title": "Coping with Surprised",
+                    "link": "https://youtube.com/example_surprised2"
+                }
+            ],
+            "feedback_question": "How do you feel after exploring your surprised?",
+            "feedback_positive": "That's great! Embracing your surprised is a step forward. \ud83c\udf1f",
+            "feedback_negative": "I'm here for you. Let\u2019s find a way to navigate through this surprised together."
+        },
+        {
+            "name": "amazed",
+            "follow_up_question": "What made you feel amazed?",
+            "reasons": [
+                "Health",
+                "Work",
+                "Relationships",
+                "Other"
+            ],
+            "comfort": "It's okay to feel amazed. Every emotion has a reason. Let\u2019s explore it together!",
+            "videos": [
+                {
+                    "title": "Understanding Amazed",
+                    "link": "https://youtube.com/example_amazed1"
+                },
+                {
+                    "title": "Coping with Amazed",
+                    "link": "https://youtube.com/example_amazed2"
+                }
+            ],
+            "feedback_question": "How do you feel after exploring your amazed?",
+            "feedback_positive": "That's great! Embracing your amazed is a step forward. \ud83c\udf1f",
+            "feedback_negative": "I'm here for you. Let\u2019s find a way to navigate through this amazed together."
+        },
+        {
+            "name": "confused",
+            "follow_up_question": "What made you feel confused?",
+            "reasons": [
+                "Health",
+                "Work",
+                "Relationships",
+                "Other"
+            ],
+            "comfort": "It's okay to feel confused. Every emotion has a reason. Let\u2019s explore it together!",
+            "videos": [
+                {
+                    "title": "Understanding Confused",
+                    "link": "https://youtube.com/example_confused1"
+                },
+                {
+                    "title": "Coping with Confused",
+                    "link": "https://youtube.com/example_confused2"
+                }
+            ],
+            "feedback_question": "How do you feel after exploring your confused?",
+            "feedback_positive": "That's great! Embracing your confused is a step forward. \ud83c\udf1f",
+            "feedback_negative": "I'm here for you. Let\u2019s find a way to navigate through this confused together."
+        },
+        {
+            "name": "shocked",
+            "follow_up_question": "What made you feel shocked?",
+            "reasons": [
+                "Health",
+                "Work",
+                "Relationships",
+                "Other"
+            ],
+            "comfort": "It's okay to feel shocked. Every emotion has a reason. Let\u2019s explore it together!",
+            "videos": [
+                {
+                    "title": "Understanding Shocked",
+                    "link": "https://youtube.com/example_shocked1"
+                },
+                {
+                    "title": "Coping with Shocked",
+                    "link": "https://youtube.com/example_shocked2"
+                }
+            ],
+            "feedback_question": "How do you feel after exploring your shocked?",
+            "feedback_positive": "That's great! Embracing your shocked is a step forward. \ud83c\udf1f",
+            "feedback_negative": "I'm here for you. Let\u2019s find a way to navigate through this shocked together."
+        },
+        {
+            "name": "curious",
+            "follow_up_question": "What made you feel curious?",
+            "reasons": [
+                "Health",
+                "Work",
+                "Relationships",
+                "Other"
+            ],
+            "comfort": "It's okay to feel curious. Every emotion has a reason. Let\u2019s explore it together!",
+            "videos": [
+                {
+                    "title": "Understanding Curious",
+                    "link": "https://youtube.com/example_curious1"
+                },
+                {
+                    "title": "Coping with Curious",
+                    "link": "https://youtube.com/example_curious2"
+                }
+            ],
+            "feedback_question": "How do you feel after exploring your curious?",
+            "feedback_positive": "That's great! Embracing your curious is a step forward. \ud83c\udf1f",
+            "feedback_negative": "I'm here for you. Let\u2019s find a way to navigate through this curious together."
+        },
+        {
+            "name": "disgusted",
+            "follow_up_question": "What made you feel disgusted?",
+            "reasons": [
+                "Health",
+                "Work",
+                "Relationships",
+                "Other"
+            ],
+            "comfort": "It's okay to feel disgusted. Every emotion has a reason. Let\u2019s explore it together!",
+            "videos": [
+                {
+                    "title": "Understanding Disgusted",
+                    "link": "https://youtube.com/example_disgusted1"
+                },
+                {
+                    "title": "Coping with Disgusted",
+                    "link": "https://youtube.com/example_disgusted2"
+                }
+            ],
+            "feedback_question": "How do you feel after exploring your disgusted?",
+            "feedback_positive": "That's great! Embracing your disgusted is a step forward. \ud83c\udf1f",
+            "feedback_negative": "I'm here for you. Let\u2019s find a way to navigate through this disgusted together."
+        },
+        {
+            "name": "horrified",
+            "follow_up_question": "What made you feel horrified?",
+            "reasons": [
+                "Health",
+                "Work",
+                "Relationships",
+                "Other"
+            ],
+            "comfort": "It's okay to feel horrified. Every emotion has a reason. Let\u2019s explore it together!",
+            "videos": [
+                {
+                    "title": "Understanding Horrified",
+                    "link": "https://youtube.com/example_horrified1"
+                },
+                {
+                    "title": "Coping with Horrified",
+                    "link": "https://youtube.com/example_horrified2"
+                }
+            ],
+            "feedback_question": "How do you feel after exploring your horrified?",
+            "feedback_positive": "That's great! Embracing your horrified is a step forward. \ud83c\udf1f",
+            "feedback_negative": "I'm here for you. Let\u2019s find a way to navigate through this horrified together."
+        },
+        {
+            "name": "uncomfortable",
+            "follow_up_question": "What made you feel uncomfortable?",
+            "reasons": [
+                "Health",
+                "Work",
+                "Relationships",
+                "Other"
+            ],
+            "comfort": "It's okay to feel uncomfortable. Every emotion has a reason. Let\u2019s explore it together!",
+            "videos": [
+                {
+                    "title": "Understanding Uncomfortable",
+                    "link": "https://youtube.com/example_uncomfortable1"
+                },
+                {
+                    "title": "Coping with Uncomfortable",
+                    "link": "https://youtube.com/example_uncomfortable2"
+                }
+            ],
+            "feedback_question": "How do you feel after exploring your uncomfortable?",
+            "feedback_positive": "That's great! Embracing your uncomfortable is a step forward. \ud83c\udf1f",
+            "feedback_negative": "I'm here for you. Let\u2019s find a way to navigate through this uncomfortable together."
+        },
+        {
+            "name": "repulsed",
+            "follow_up_question": "What made you feel repulsed?",
+            "reasons": [
+                "Health",
+                "Work",
+                "Relationships",
+                "Other"
+            ],
+            "comfort": "It's okay to feel repulsed. Every emotion has a reason. Let\u2019s explore it together!",
+            "videos": [
+                {
+                    "title": "Understanding Repulsed",
+                    "link": "https://youtube.com/example_repulsed1"
+                },
+                {
+                    "title": "Coping with Repulsed",
+                    "link": "https://youtube.com/example_repulsed2"
+                }
+            ],
+            "feedback_question": "How do you feel after exploring your repulsed?",
+            "feedback_positive": "That's great! Embracing your repulsed is a step forward. \ud83c\udf1f",
+            "feedback_negative": "I'm here for you. Let\u2019s find a way to navigate through this repulsed together."
+        },
+        {
+            "name": "bored",
+            "follow_up_question": "What made you feel bored?",
+            "reasons": [
+                "Health",
+                "Work",
+                "Relationships",
+                "Other"
+            ],
+            "comfort": "It's okay to feel bored. Every emotion has a reason. Let\u2019s explore it together!",
+            "videos": [
+                {
+                    "title": "Understanding Bored",
+                    "link": "https://youtube.com/example_bored1"
+                },
+                {
+                    "title": "Coping with Bored",
+                    "link": "https://youtube.com/example_bored2"
+                }
+            ],
+            "feedback_question": "How do you feel after exploring your bored?",
+            "feedback_positive": "That's great! Embracing your bored is a step forward. \ud83c\udf1f",
+            "feedback_negative": "I'm here for you. Let\u2019s find a way to navigate through this bored together."
+        },
+        {
+            "name": "tired",
+            "follow_up_question": "What made you feel tired?",
+            "reasons": [
+                "Health",
+                "Work",
+                "Relationships",
+                "Other"
+            ],
+            "comfort": "It's okay to feel tired. Every emotion has a reason. Let\u2019s explore it together!",
+            "videos": [
+                {
+                    "title": "Understanding Tired",
+                    "link": "https://youtube.com/example_tired1"
+                },
+                {
+                    "title": "Coping with Tired",
+                    "link": "https://youtube.com/example_tired2"
+                }
+            ],
+            "feedback_question": "How do you feel after exploring your tired?",
+            "feedback_positive": "That's great! Embracing your tired is a step forward. \ud83c\udf1f",
+            "feedback_negative": "I'm here for you. Let\u2019s find a way to navigate through this tired together."
+        },
+        {
+            "name": "lazy",
+            "follow_up_question": "What made you feel lazy?",
+            "reasons": [
+                "Health",
+                "Work",
+                "Relationships",
+                "Other"
+            ],
+            "comfort": "It's okay to feel lazy. Every emotion has a reason. Let\u2019s explore it together!",
+            "videos": [
+                {
+                    "title": "Understanding Lazy",
+                    "link": "https://youtube.com/example_lazy1"
+                },
+                {
+                    "title": "Coping with Lazy",
+                    "link": "https://youtube.com/example_lazy2"
+                }
+            ],
+            "feedback_question": "How do you feel after exploring your lazy?",
+            "feedback_positive": "That's great! Embracing your lazy is a step forward. \ud83c\udf1f",
+            "feedback_negative": "I'm here for you. Let\u2019s find a way to navigate through this lazy together."
+        },
+        {
+            "name": "drained",
+            "follow_up_question": "What made you feel drained?",
+            "reasons": [
+                "Health",
+                "Work",
+                "Relationships",
+                "Other"
+            ],
+            "comfort": "It's okay to feel drained. Every emotion has a reason. Let\u2019s explore it together!",
+            "videos": [
+                {
+                    "title": "Understanding Drained",
+                    "link": "https://youtube.com/example_drained1"
+                },
+                {
+                    "title": "Coping with Drained",
+                    "link": "https://youtube.com/example_drained2"
+                }
+            ],
+            "feedback_question": "How do you feel after exploring your drained?",
+            "feedback_positive": "That's great! Embracing your drained is a step forward. \ud83c\udf1f",
+            "feedback_negative": "I'm here for you. Let\u2019s find a way to navigate through this drained together."
+        },
+        {
+            "name": "motivated",
+            "follow_up_question": "What made you feel motivated?",
+            "reasons": [
+                "Health",
+                "Work",
+                "Relationships",
+                "Other"
+            ],
+            "comfort": "It's okay to feel motivated. Every emotion has a reason. Let\u2019s explore it together!",
+            "videos": [
+                {
+                    "title": "Understanding Motivated",
+                    "link": "https://youtube.com/example_motivated1"
+                },
+                {
+                    "title": "Coping with Motivated",
+                    "link": "https://youtube.com/example_motivated2"
+                }
+            ],
+            "feedback_question": "How do you feel after exploring your motivated?",
+            "feedback_positive": "That's great! Embracing your motivated is a step forward. \ud83c\udf1f",
+            "feedback_negative": "I'm here for you. Let\u2019s find a way to navigate through this motivated together."
+        },
+        {
+            "name": "determined",
+            "follow_up_question": "What made you feel determined?",
+            "reasons": [
+                "Health",
+                "Work",
+                "Relationships",
+                "Other"
+            ],
+            "comfort": "It's okay to feel determined. Every emotion has a reason. Let\u2019s explore it together!",
+            "videos": [
+                {
+                    "title": "Understanding Determined",
+                    "link": "https://youtube.com/example_determined1"
+                },
+                {
+                    "title": "Coping with Determined",
+                    "link": "https://youtube.com/example_determined2"
+                }
+            ],
+            "feedback_question": "How do you feel after exploring your determined?",
+            "feedback_positive": "That's great! Embracing your determined is a step forward. \ud83c\udf1f",
+            "feedback_negative": "I'm here for you. Let\u2019s find a way to navigate through this determined together."
+        },
+        {
+            "name": "energetic",
+            "follow_up_question": "What made you feel energetic?",
+            "reasons": [
+                "Health",
+                "Work",
+                "Relationships",
+                "Other"
+            ],
+            "comfort": "It's okay to feel energetic. Every emotion has a reason. Let\u2019s explore it together!",
+            "videos": [
+                {
+                    "title": "Understanding Energetic",
+                    "link": "https://youtube.com/example_energetic1"
+                },
+                {
+                    "title": "Coping with Energetic",
+                    "link": "https://youtube.com/example_energetic2"
+                }
+            ],
+            "feedback_question": "How do you feel after exploring your energetic?",
+            "feedback_positive": "That's great! Embracing your energetic is a step forward. \ud83c\udf1f",
+            "feedback_negative": "I'm here for you. Let\u2019s find a way to navigate through this energetic together."
+        },
+        {
+            "name": "passionate",
+            "follow_up_question": "What made you feel passionate?",
+            "reasons": [
+                "Health",
+                "Work",
+                "Relationships",
+                "Other"
+            ],
+            "comfort": "It's okay to feel passionate. Every emotion has a reason. Let\u2019s explore it together!",
+            "videos": [
+                {
+                    "title": "Understanding Passionate",
+                    "link": "https://youtube.com/example_passionate1"
+                },
+                {
+                    "title": "Coping with Passionate",
+                    "link": "https://youtube.com/example_passionate2"
+                }
+            ],
+            "feedback_question": "How do you feel after exploring your passionate?",
+            "feedback_positive": "That's great! Embracing your passionate is a step forward. \ud83c\udf1f",
+            "feedback_negative": "I'm here for you. Let\u2019s find a way to navigate through this passionate together."
+        },
+        {
+            "name": "inspired",
+            "follow_up_question": "What made you feel inspired?",
+            "reasons": [
+                "Health",
+                "Work",
+                "Relationships",
+                "Other"
+            ],
+            "comfort": "It's okay to feel inspired. Every emotion has a reason. Let\u2019s explore it together!",
+            "videos": [
+                {
+                    "title": "Understanding Inspired",
+                    "link": "https://youtube.com/example_inspired1"
+                },
+                {
+                    "title": "Coping with Inspired",
+                    "link": "https://youtube.com/example_inspired2"
+                }
+            ],
+            "feedback_question": "How do you feel after exploring your inspired?",
+            "feedback_positive": "That's great! Embracing your inspired is a step forward. \ud83c\udf1f",
+            "feedback_negative": "I'm here for you. Let\u2019s find a way to navigate through this inspired together."
+        },
+        {
+            "name": "optimistic",
+            "follow_up_question": "What made you feel optimistic?",
+            "reasons": [
+                "Health",
+                "Work",
+                "Relationships",
+                "Other"
+            ],
+            "comfort": "It's okay to feel optimistic. Every emotion has a reason. Let\u2019s explore it together!",
+            "videos": [
+                {
+                    "title": "Understanding Optimistic",
+                    "link": "https://youtube.com/example_optimistic1"
+                },
+                {
+                    "title": "Coping with Optimistic",
+                    "link": "https://youtube.com/example_optimistic2"
+                }
+            ],
+            "feedback_question": "How do you feel after exploring your optimistic?",
+            "feedback_positive": "That's great! Embracing your optimistic is a step forward. \ud83c\udf1f",
+            "feedback_negative": "I'm here for you. Let\u2019s find a way to navigate through this optimistic together."
+        },
+        {
+            "name": "empowered",
+            "follow_up_question": "What made you feel empowered?",
+            "reasons": [
+                "Health",
+                "Work",
+                "Relationships",
+                "Other"
+            ],
+            "comfort": "It's okay to feel empowered. Every emotion has a reason. Let\u2019s explore it together!",
+            "videos": [
+                {
+                    "title": "Understanding Empowered",
+                    "link": "https://youtube.com/example_empowered1"
+                },
+                {
+                    "title": "Coping with Empowered",
+                    "link": "https://youtube.com/example_empowered2"
+                }
+            ],
+            "feedback_question": "How do you feel after exploring your empowered?",
+            "feedback_positive": "That's great! Embracing your empowered is a step forward. \ud83c\udf1f",
+            "feedback_negative": "I'm here for you. Let\u2019s find a way to navigate through this empowered together."
+        },
+        {
+            "name": "calm",
+            "follow_up_question": "What made you feel calm?",
+            "reasons": [
+                "Health",
+                "Work",
+                "Relationships",
+                "Other"
+            ],
+            "comfort": "It's okay to feel calm. Every emotion has a reason. Let\u2019s explore it together!",
+            "videos": [
+                {
+                    "title": "Understanding Calm",
+                    "link": "https://youtube.com/example_calm1"
+                },
+                {
+                    "title": "Coping with Calm",
+                    "link": "https://youtube.com/example_calm2"
+                }
+            ],
+            "feedback_question": "How do you feel after exploring your calm?",
+            "feedback_positive": "That's great! Embracing your calm is a step forward. \ud83c\udf1f",
+            "feedback_negative": "I'm here for you. Let\u2019s find a way to navigate through this calm together."
+        },
+        {
+            "name": "relaxed",
+            "follow_up_question": "What made you feel relaxed?",
+            "reasons": [
+                "Health",
+                "Work",
+                "Relationships",
+                "Other"
+            ],
+            "comfort": "It's okay to feel relaxed. Every emotion has a reason. Let\u2019s explore it together!",
+            "videos": [
+                {
+                    "title": "Understanding Relaxed",
+                    "link": "https://youtube.com/example_relaxed1"
+                },
+                {
+                    "title": "Coping with Relaxed",
+                    "link": "https://youtube.com/example_relaxed2"
+                }
+            ],
+            "feedback_question": "How do you feel after exploring your relaxed?",
+            "feedback_positive": "That's great! Embracing your relaxed is a step forward. \ud83c\udf1f",
+            "feedback_negative": "I'm here for you. Let\u2019s find a way to navigate through this relaxed together."
+        },
+        {
+            "name": "peaceful",
+            "follow_up_question": "What made you feel peaceful?",
+            "reasons": [
+                "Health",
+                "Work",
+                "Relationships",
+                "Other"
+            ],
+            "comfort": "It's okay to feel peaceful. Every emotion has a reason. Let\u2019s explore it together!",
+            "videos": [
+                {
+                    "title": "Understanding Peaceful",
+                    "link": "https://youtube.com/example_peaceful1"
+                },
+                {
+                    "title": "Coping with Peaceful",
+                    "link": "https://youtube.com/example_peaceful2"
+                }
+            ],
+            "feedback_question": "How do you feel after exploring your peaceful?",
+            "feedback_positive": "That's great! Embracing your peaceful is a step forward. \ud83c\udf1f",
+            "feedback_negative": "I'm here for you. Let\u2019s find a way to navigate through this peaceful together."
+        },
+        {
+            "name": "focused",
+            "follow_up_question": "What made you feel focused?",
+            "reasons": [
+                "Health",
+                "Work",
+                "Relationships",
+                "Other"
+            ],
+            "comfort": "It's okay to feel focused. Every emotion has a reason. Let\u2019s explore it together!",
+            "videos": [
+                {
+                    "title": "Understanding Focused",
+                    "link": "https://youtube.com/example_focused1"
+                },
+                {
+                    "title": "Coping with Focused",
+                    "link": "https://youtube.com/example_focused2"
+                }
+            ],
+            "feedback_question": "How do you feel after exploring your focused?",
+            "feedback_positive": "That's great! Embracing your focused is a step forward. \ud83c\udf1f",
+            "feedback_negative": "I'm here for you. Let\u2019s find a way to navigate through this focused together."
+        }
+    ]
+};
+
+// Chatbot State Variables
+let currentStep = 0; // Tracks the current step in the conversation
+let selectedEmotion = null; // Stores the selected emotion object
+let userName = ""; // Stores the user's name
+
+// Initialize Chatbot on DOM Load
+document.addEventListener("DOMContentLoaded", () => {
+    const sendButton = document.getElementById("send-button");
+    const userInput = document.getElementById("user-input");
+
+    sendButton.addEventListener("click", handleUserInput);
+    userInput.addEventListener("keypress", function(e) {
+        if (e.key === 'Enter') {
+            handleUserInput();
+        }
+    });
+
+    startChat();
+});
+
+// Start the Chatbot Conversation
+function startChat() {
+    sendBotMessage("Welcome to the Emotion Chatbot! Please type anything to begin.");
+    enableUserInput();
+}
+
+// Enable the input field and send button
+function enableUserInput() {
+    document.getElementById("user-input").disabled = false;
+    document.getElementById("send-button").disabled = false;
+    document.getElementById("user-input").focus();
+}
+
+// Disable the input field and send button
+function disableUserInput() {
+    document.getElementById("user-input").disabled = true;
+    document.getElementById("send-button").disabled = true;
+}
+
+// Handle User Input (Button Clicks or Text Input)
+function handleUserInput() {
+    const userInput = document.getElementById("user-input");
+    const input = userInput.value.trim();
+    if (input === "") return;
+
+    sendUserMessage(input);
+    userInput.value = "";
+
+    processInput(input);
+}
+
+// Process User Input Based on Current Step
+function processInput(input) {
+    if (currentStep === 0) {
+        // Step 0: User typed anything to start
+        currentStep++;
+        sendBotMessage("Hi! What is your name?");
+    } else if (currentStep === 1) {
+        // Step 1: Receive user's name
+        userName = input;
+        currentStep++;
+        sendBotMessage(`Hi! ${userName}! How are you feeling today?`);
+        displayEmotionOptions();
+    } else if (currentStep === 2) {
+        // Step 2: Emotion Selection
+        const emotion = emotionsData.emotions.find(em => em.name.toLowerCase() === input.toLowerCase());
+        if (emotion) {
+            selectedEmotion = emotion;
+            currentStep++;
+            sendBotMessage(selectedEmotion.follow_up_question, generateButtons(selectedEmotion.reasons, "reason"));
+        } else {
+            sendBotMessage("I'm sorry, I didn't recognize that emotion. Please select from the options below.", generateButtons(emotionsData.emotions.map(e => e.name), "emotion"));
+        }
+    } else if (currentStep === 3) {
+        // Step 3: Reason Selection
+        if (selectedEmotion.reasons.map(r => r.toLowerCase()).includes(input.toLowerCase())) {
+            currentStep++;
+            sendBotMessage(selectedEmotion.comfort);
+            displayVideos(selectedEmotion.videos);
+            sendBotMessage(selectedEmotion.feedback_question, generateButtons(["Positive", "Negative"], "feedback"));
+        } else {
+            sendBotMessage("Please select a valid reason from the options below.", generateButtons(selectedEmotion.reasons, "reason"));
+        }
+    } else if (currentStep === 4) {
+        // Step 4: Feedback Given
+        if (input.toLowerCase() === "positive") {
+            sendBotMessage(selectedEmotion.feedback_positive);
+            currentStep++;
+            askToDiscussAnotherEmotion();
+        } else if (input.toLowerCase() === "negative") {
+            sendBotMessage(selectedEmotion.feedback_negative);
+            currentStep++;
+            askToDiscussAnotherEmotion();
+        } else {
+            sendBotMessage("Please select 'Positive' or 'Negative' from the options below.", generateButtons(["Positive", "Negative"], "feedback"));
+        }
+    } else if (currentStep === 5) {
+        // Step 5: Decide to continue or end
+        if (input.toLowerCase() === "yes") {
+            sendBotMessage("Great! Let's discuss another emotion.");
+            currentStep = 2; // Reset to emotion selection step
+            sendBotMessage("How are you feeling today?");
+            displayEmotionOptions();
+        } else if (input.toLowerCase() === "no") {
+            sendBotMessage("Thank you! Bye!! 👋");
+            resetChat();
+        } else {
+            sendBotMessage("Please select 'Yes' or 'No' from the options below.", generateButtons(["Yes", "No"], "continue"));
+        }
+    }
+}
+
+// Ask the user if they want to discuss another emotion
+function askToDiscussAnotherEmotion() {
+    sendBotMessage("Would you like to discuss another emotion?", generateButtons(["Yes", "No"], "continue"));
+}
+
+// Send Bot Message to Chat Window
+function sendBotMessage(message, options = null) {
+    const messagesDiv = document.getElementById("messages");
+    const messageElem = document.createElement("div");
+    messageElem.classList.add("message", "bot-message");
+    messageElem.innerHTML = message;
+    if (options) {
+        messageElem.innerHTML += `<div class="options">${options}</div>`;
+    }
+    messagesDiv.appendChild(messageElem);
+    scrollToBottom();
+}
+
+// Send User Message to Chat Window
+function sendUserMessage(message) {
+    const messagesDiv = document.getElementById("messages");
+    const messageElem = document.createElement("div");
+    messageElem.classList.add("message", "user-message");
+    messageElem.textContent = message;
+    messagesDiv.appendChild(messageElem);
+    scrollToBottom();
+}
+
+// Generate Buttons for Options
+function generateButtons(options, type) {
+    return options.map(option => `<button class="option-button" data-type="${type}" data-value="${option}">${option}</button>`).join(" ");
+}
+
+// Display Related Videos
+function displayVideos(videos) {
+    const messagesDiv = document.getElementById("messages");
+    videos.forEach(video => {
+        const videoElem = document.createElement("div");
+        videoElem.classList.add("video");
+        videoElem.innerHTML = `<a href="${video.link}" target="_blank">${video.title}</a>`;
+        messagesDiv.appendChild(videoElem);
+    });
+}
+
+// Reset Chat for New Interaction
+function resetChat() {
+    currentStep = 0;
+    selectedEmotion = null;
+    userName = "";
+    sendBotMessage("If you want to start over, please refresh the page.");
+    disableUserInput();
+}
+
+// Scroll Chat to Bottom
+function scrollToBottom() {
+    const chatWindow = document.getElementById("chat-window");
+    chatWindow.scrollTop = chatWindow.scrollHeight;
+}
+
+// Event Delegation for Option Buttons
+document.addEventListener("click", function(event) {
+    if (event.target.classList.contains("option-button")) {
+        const type = event.target.getAttribute("data-type");
+        const value = event.target.getAttribute("data-value");
+        sendUserMessage(value);
+        processInput(value);
+    }
+});
+
+</script>
+
+{% endblock %}

@@ -1,0 +1,65 @@
+{% extends 'index.html' %}
+
+{% block navbar %}
+    <ul class="navbar-nav ml-auto">
+        <li class="nav-item active">
+            <a class="nav-link" href="{{url_for('home')}}" style="color: white;">Home</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="{{url_for('yoga1')}}" style="color: yellow; padding-left: 30px;">Yoga</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="{{url_for('dashboard')}}" style="color: white; padding-left: 30px;">Dashboard</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="{{url_for('index')}}" style="color: white; padding-left: 30px;">Logout</a>
+        </li>
+    </ul>
+{% endblock %}
+
+
+{% block content %}
+    <div style="min-height: 800px; background-color: rgba(0, 0, 0, 0.797);">
+        <div class="container-fluid">
+            <div class="contact_section_2">
+                <div class="row">
+                    <div class="col-md-12">
+                        <center>
+                            <div style="background-color: rgba(255, 255, 255, 0.575); width: fit-content; height: fit-content; border-radius: 10px;">
+                                <div class="col-11" style="padding-top: 20px; padding-bottom: 20px;">
+                                    
+                                    <h1 class="contact_taital" style="color: rgba(0, 0, 0, 0.849);">Result</h1>
+
+                                    {% if image_name %}
+                                        <div class="pose-image">
+                                            <h2>Annotated Pose:</h2>
+                                            <img src="{{ url_for('static', filename='saved_images/' ~ image_name) }}" alt="Annotated Yoga Pose">
+                                        </div>
+                                    {% endif %}
+
+                                    {% if feedback %}
+                                        {% if feedback is string %}
+                                            <p>{{ feedback }}</p>
+                                        {% else %}
+                                            <h2>Corrections Needed:</h2>
+                                            <ul>
+                                                {% for correction in feedback %}
+                                                    <li>{{ correction }}</li>
+                                                {% endfor %}
+                                            </ul>
+                                        {% endif %}
+                                    {% endif %}<br><br>
+
+                                </div>
+
+                                <a href="{{url_for('yoga1')}}" class="btn btn-info" style="margin-top: 20px; width: 30%;">Predcit again</a><br><br>
+
+                            </div>
+                        </center>
+                        
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div
+{% endblock %}

@@ -1,0 +1,42 @@
+{% extends 'index.html' %}
+
+{% block navbar %}
+    <ul class="navbar-nav ml-auto">
+        <li class="nav-item active">
+            <a class="nav-link" href="{{url_for('home')}}" style="color: yellow;">Home</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="{{url_for('yoga1')}}" style="color: white; padding-left: 30px;">Yoga</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="{{url_for('dashboard')}}" style="color: white; padding-left: 30px;">Dashboard</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="{{url_for('index')}}" style="color: white; padding-left: 30px;">Logout</a>
+        </li>
+    </ul>
+{% endblock %}
+
+{% block content %}
+<div class="banner_section layout_padding" style="display: flex; align-items: center; justify-content: center; height: 100vh; background-color: rgba(0, 0, 0, 0.797);">
+    <div class="container">
+       <div id="banner_slider" class="carousel slide" data-ride="carousel">
+          <div class="carousel-inner">
+             <div class="carousel-item active">
+                <div class="row justify-content-center">
+                   <div class="banner_taital_main text-center" style="margin-top: -110px;">
+                      
+                      <h1 class="banner_taital" style="color: white;">WELCOME!</h1>
+                      <h5 class="tasty_text">Interactive web application for mental well being</h5>
+                      <p class="banner_text" style="color: white;">
+                         "Empower Your Mind, Elevate Your Life"
+                      </p>
+                      
+                   </div>
+                </div>
+             </div>
+          </div>
+       </div>
+    </div>
+ </div>
+{% endblock %}

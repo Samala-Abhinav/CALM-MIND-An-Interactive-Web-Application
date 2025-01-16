@@ -1,0 +1,66 @@
+{% extends 'index.html' %}
+
+{% block navbar %}
+    <ul class="navbar-nav ml-auto">
+        <li class="nav-item active">
+            <a class="nav-link" href="{{url_for('home')}}" style="color: white;">Home</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="{{url_for('yoga1')}}" style="color: yellow; padding-left: 30px;">Yoga</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="{{url_for('dashboard')}}" style="color: white; padding-left: 30px;">Dashboard</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="{{url_for('index')}}" style="color: white; padding-left: 30px;">Logout</a>
+        </li>
+    </ul>
+{% endblock %}
+
+
+{% block content %}
+    <div style="min-height: 650px; background-color: rgba(0, 0, 0, 0.797);">
+        <div class="container-fluid">
+            <div class="contact_section_2">
+                <div class="row">
+                    <div class="col-md-12">
+                        <center>
+                            <form action="{{url_for('yoga1')}}" method="post" style="background-color: rgba(255, 255, 255, 0.575); width: 600px; border-radius: 10px;">
+                                <div class="col-11" style="padding-top: 20px; padding-bottom: 20px;">
+                                    
+                                    <h1 class="contact_taital" style="color: rgba(0, 0, 0, 0.849);">Select Current Mood</h1>
+
+                                    <select name="mood" class="mail_text" required>
+                                        <option value="">Choose your current mood</option>
+                                        <option value="Calm">Calm</option>
+                                        <option value="Addiction">Addiction</option>
+                                        <option value="Energetic">Energetic</option>
+                                        <option value="Sadness">Sadness</option>
+                                        <option value="Difficulty Sleeping">Difficulty Sleeping</option>
+                                        <option value="Stress">Stress</option>
+                                        <option value="Jealousy">Jealousy</option>
+                                        <option value="Fear">Fear</option>
+                                        <option value="Grief">Grief</option>
+                                        <option value="Overwhelmed">Overwhelmed</option>
+                                        <option value="Frustration">Frustration</option>
+                                        <option value="Anxious">Anxious</option>
+                                        <option value="Excited">Excited</option>
+                                        <option value="Loneliness">Loneliness</option>
+                                        <option value="Pressure">Pressure</option>
+                                        <option value="Gratitude">Gratitude</option>
+                                        <option value="Angry">Angry</option>
+                                        <option value="Depression">Depression</option>
+                                        <option value="Contentment">Contentment</option>
+                                    </select>
+
+                                    <button type="submit" class="btn btn-info" style="margin-top: 20px; width: 30%;">Submit</button><br><br>
+                                </div>
+                            </form>
+                        </center>
+                        
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

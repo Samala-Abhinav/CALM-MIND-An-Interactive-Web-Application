@@ -1,0 +1,54 @@
+{% extends 'index.html' %}
+
+
+{% block navbar %}
+    <ul class="navbar-nav ml-auto">
+        <li class="nav-item active">
+            <a class="nav-link" href="{{url_for('index')}}" style="color: white;">Home</a>
+        </li>
+        <li class="nav-item active">
+            <a class="nav-link" href="{{url_for('about')}}" style="color: white; padding-left: 40px;">About</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="{{url_for('register')}}" style="color: white; padding-left: 40px;">Register</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="{{url_for('login')}}" style="color: yellow; padding-left: 40px;">LogIn</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="{{url_for('chatbot')}}" style="color: white; padding-left: 40px;">Chatbot</a>
+        </li>
+    </ul>
+{% endblock %}
+
+
+{% block content %}
+    <div style="min-height: 650px; background-color: rgba(0, 0, 0, 0.797);">
+        <div class="container-fluid">
+            <div class="contact_section_2">
+                <div class="row">
+                    <div class="col-md-12">
+                        <center>
+                            <form action="{{url_for('login')}}" method="post" style="background-color: rgba(255, 255, 255, 0.575); width: 600px; border-radius: 10px;">
+                                <div class="col-11" style="padding-top: 20px; padding-bottom: 20px;">
+                                    
+                                    <h1 class="contact_taital" style="color: rgba(0, 0, 0, 0.849);">Login</h1>
+
+                                    <input type="email" name="email" class="mail_text" placeholder="Email ID" required>
+                                    <input type="password" name="password" class="mail_text" placeholder="Password" required>
+                                    <button type="submit" class="btn btn-info" style="margin-top: 20px; width: 30%;">Submit</button><br><br>
+
+                                    <a href="{{url_for('register')}}">
+                                        Don't you have an account? 
+                                        <u style="color: blue;"><i>Register here</i></u>
+                                    </a>
+                                </div>
+                            </form>
+                        </center>
+                        
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

@@ -1,0 +1,45 @@
+{% extends 'index.html' %}
+
+
+{% block navbar %}
+    <ul class="navbar-nav ml-auto">
+        <li class="nav-item active">
+            <a class="nav-link" href="{{url_for('index')}}" style="color: white;">Home</a>
+        </li>
+        <li class="nav-item active">
+            <a class="nav-link" href="{{url_for('about')}}" style="color: yellow; padding-left: 40px;">About</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="{{url_for('register')}}" style="color: white; padding-left: 40px;">Register</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="{{url_for('login')}}" style="color: white; padding-left: 40px;">LogIn</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="{{url_for('chatbot')}}" style="color: white; padding-left: 40px;">Chatbot</a>
+        </li>
+    </ul>
+{% endblock %}
+
+
+{% block content %}
+    <div style="display: flex; align-items: center; justify-content: center; background-color: rgba(0, 0, 0, 0.797); min-height: 700px;">
+        <div class="p-4 bg-white rounded shadow">
+            <div class="row">
+                <div class="col">
+                    <img src="/static/images/about.jpg" style="height: 800px;">
+                </div>
+                <div class="col">
+                    <p style="text-align: justify;">
+                        In the contemporary landscape where mental well-being is paramount, the integration of technology into wellness practices offers innovative solutions to enhance personal health regimes. This project, "Interactive Web Application for Mental Well-Being," aims to develop a comprehensive platform that synergizes personalized yoga practice with an emotion-aware chatbot to promote holistic health. The system comprises two primary modules: Yoga and Chatbot.
+                        The Yoga Module begins by assessing the user’s current emotional state through a selection of 19 predefined moods. Based on this input, the system recommends three tailored yoga poses from a dataset of 77 poses designed to address specific emotional needs. To ensure correct pose execution, the module employs advanced computer vision techniques, utilizing the YOLO (You Only Look Once) model for accurate pose detection and PoseNet for extracting key joint features. An angle heuristic algorithm analyzes the user’s posture, providing real-time corrective feedback to enhance the effectiveness and safety of the practice.
+                        Complementing the Yoga Module, the Chatbot Module engages users by recognizing and responding to 59 distinct emotions. Through an intuitive conversational flow, the chatbot inquires about the reasons behind the user’s emotions, offers empathetic support, and recommends relevant YouTube videos to aid in emotional regulation. Post-interaction, the chatbot gathers feedback to refine its responses, ensuring a personalized and supportive user experience.
+                        By combining personalized physical activity with emotional support, this web application provides a unique and effective tool for individuals seeking to improve their mental and physical well-being. The integration of cutting-edge machine learning and natural language processing technologies ensures that users receive tailored guidance and support, fostering a balanced and healthy lifestyle.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+
